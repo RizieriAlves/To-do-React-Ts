@@ -84,7 +84,7 @@ const CreateTask = () => {
   };
 
   const renderTasks = () => {
-    let task_order;
+    let task_order: { name: string; date: string }[] = [];
     if (tasks.length > 1) {
       task_order = tasks.sort((a, b) => {
         const dateA = new Date(a.date);
