@@ -1,0 +1,15 @@
+footer {
+  background-color: darkslategray;
+  padding: 20px;
+  color: white;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+
+  & span {
+    color: aqua;
+    font-weight: bolder;
+  }
+}
