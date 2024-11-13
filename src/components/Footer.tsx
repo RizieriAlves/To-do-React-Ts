@@ -3,7 +3,10 @@ import "./Footer.css";
 const Footer = () => {
   return (
     <footer>
-      <span>React + TS Todo</span>@ 2024
+      <p>
+        Desenvolvido por:
+        <a href="https://www.linkedin.com/in/rizierialves/">Vinicius Rizieri</a>
+      </p>
     </footer>
   );
 };
