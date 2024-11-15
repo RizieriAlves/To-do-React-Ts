@@ -40,6 +40,9 @@
   text-align: center;
   padding: 20px;
   height: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 
   & input,
   button {
@@ -75,27 +78,52 @@
   display: flex;
   justify-content: space-evenly;
   gap: 30px;
+  display: flex;
 
   & span {
     padding: 10px;
     border: 1px solid white;
     border-radius: 5px;
+    display: flex;
+    gap: 5px;
   }
 
   & span:hover {
-    background-color: blue;
+    background-color: rgba(0, 0, 255, 0.507);
     cursor: pointer;
   }
 }
 
-.selected_filter {
-  align-self: self-start;
+.message {
+  background-color: rgba(255, 0, 0, 0.692);
+  color: white;
+  padding: 5px 15px;
+  font-size: 1.2em;
+  width: fit-content;
+  margin: 10px auto;
+  margin-top: 0;
+  gap: 20px;
+  border-radius: 10px;
+  text-align: center;
   display: flex;
-  flex-direction: column;
-  gap: 5px;
-  text-align: left;
+  justify-content: space-evenly;
 }
 
+.selected_filter {
+  display: flex;
+  margin: auto;
+  width: 50%;
+  border-bottom: 2px solid white;
+  justify-content: space-evenly;
+  text-align: left;
+  font-weight: bold;
+}
+
+.second_filters {
+  display: flex;
+  gap: 20px;
+  text-align: center;
+}
 .tasks_container {
   margin: auto;
   min-width: 300px;
@@ -104,7 +132,7 @@
   flex-direction: column;
   align-items: center;
   background-color: rgba(42, 110, 165, 0.637);
-  padding: 20px;
+  padding: 2.5vw;
   padding-top: 0;
   color: white;
   gap: 15px;
@@ -114,7 +142,6 @@
   display: flex;
   width: 50vw;
   min-width: 300px;
-
   border: 1px solid white;
   padding: 10px;
   font-size: 1.2em;
@@ -123,18 +150,34 @@
   color: white;
   flex-wrap: wrap;
   justify-content: space-evenly;
-  text-align: left;
+  text-align: center;
+}
+.task svg:first-child {
+  width: 25px;
+  height: 25px;
+}
+
+.task span {
+  width: 150px;
+}
+
+.task_header {
+  border: 1px solid white;
+  padding: 10px;
+  font-size: 1.2em;
+  width: 50vw;
+  display: flex;
+  text-align: center;
+  justify-content: space-evenly;
   & span {
-    width: 20%;
-    min-width: 100px;
-    text-align: center;
-  }
-  & svg {
-    width: 20%;
-    min-width: 50px;
+    display: block;
+    width: 150px;
   }
 }
 
+.task_header div {
+  width: 25px;
+}
 .editForm * {
   width: 30vw;
   min-width: 300px;
@@ -159,16 +202,126 @@ button {
   gap: 10px;
 }
 
-@media screen and (max-width: 700px) {
-  .createtask_container {
-    width: 100vw;
+@media screen and (max-width: 1605px) {
+  .categories_container {
+    width: 30vw;
   }
 
   .tasks_container {
-    width: 100vw;
+    width: 80vw;
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .task,
+  .task_header {
+    width: 80vw;
+  }
+
+  .selected_filter {
+    width: 70vw;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .task_categories {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+  }
+  .createtask_container {
+    width: 80vw;
+  }
+
+  .categories_container {
+    width: 80vw;
+  }
+
+  .tasks_container {
+    width: 90vw;
   }
 
   .task {
     margin: 10px 0px;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .message {
+    padding: 10px;
+    gap: 5px;
+    justify-content: space-around;
+
+    & p {
+      width: 280px;
+    }
+  }
+  .tasks_container {
+    width: 95vw;
+    padding: 10px;
+  }
+  .selected_filter {
+    width: 100vw;
+  }
+  .filters {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .task,
+  .task_header {
+    width: 90vw;
+  }
+
+  .task span {
+    width: 100px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .tasks_container {
+    padding: 0;
+    width: 100vw;
+  }
+
+  .createtask_container {
+    width: 100vw;
+
+    & input {
+      min-width: 280px;
+      width: 280px;
+    }
+    & form select {
+      min-width: 280px;
+      width: 280px;
+      margin: 0;
+    }
+  }
+
+  .category {
+    display: none;
+  }
+
+  .task_header {
+    display: none;
+  }
+  .selected_filter {
+    flex-direction: column;
+    gap: 5px;
+    margin-left: 10px;
+    border: none;
+  }
+
+  .task {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    justify-content: space-evenly;
+    flex-wrap: nowrap;
+  }
+
+  .task span {
+    width: min-content;
   }
 }

@@ -2,22 +2,26 @@ import "./CreateTask.css";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa6";
 import { FaPencilAlt } from "react-icons/fa";
+import { FaRegSquareCheck } from "react-icons/fa6";
+import { FaRegSquareFull } from "react-icons/fa6";
 
 const CreateTask = () => {
   const [taskName, setTaskName] = useState<string>("");
   const [date, setDate] = useState<string>("");
   const [tasks, setTasks] = useState<
-    { name: string; date: string; category: string }[]
+    { name: string; date: string; category: string; done: boolean }[]
   >([]);
   const [indexEdit, setIndexEdit] = useState<number | null>(null);
   const [edit, setEdit] = useState<boolean>(false);
-
   const [newCategory, setNewCategory] = useState<string>("");
   const [categories, setCategories] = useState<string[]>([]);
   const [category, setCategory] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>("");
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
   const [filterDate, setFilterDate] = useState<string | null>("Todo o período");
+  const [done, setDone] = useState<boolean>(false);
+  const [hideDone, setHideDone] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
 
   //Feito desta forma pois devido ao fuso, era reduzido um dia no transformação com toLocaleDateString()
   const formatDate = (date: string) => {
@@ -32,10 +36,16 @@ const CreateTask = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const task: { name: string; date: string; category: string } = {
+    const task: {
+      name: string;
+      date: string;
+      category: string;
+      done: boolean;
+    } = {
       name: taskName,
       date: date,
       category: category,
+      done: false,
     };
 
     setTasks((tasks) => [...tasks, task]);
@@ -44,18 +54,28 @@ const CreateTask = () => {
   };
 
   const handleEdit = (index: number) => {
-    const task: { name: string; date: string; category: string } = {
+    const task: {
+      name: string;
+      date: string;
+      category: string;
+      done: boolean;
+    } = {
       name: taskName,
       date: date,
       category: category,
+      done: done,
     };
-    const newTaskList: { name: string; date: string; category: string }[] = [
-      ...tasks,
-    ];
+    const newTaskList: {
+      name: string;
+      date: string;
+      category: string;
+      done: boolean;
+    }[] = [...tasks];
     newTaskList[index] = task;
     setDate("");
     setTaskName("");
     setIndexEdit(null);
+    setDone(false);
     return setTasks(newTaskList);
   };
 
@@ -93,10 +113,25 @@ const CreateTask = () => {
     localStorage.setItem("categories", JSON.stringify(categories));
   };
 
+  const toogleDone = (index: number) => {
+    const newtasks = tasks.map((task, i) => {
+      if (i == index) {
+        task.done = !task.done;
+        return task;
+      }
+      return task;
+    });
+    setTasks(newtasks);
+  };
   //Check filters, set tasks order, render tasks
   const renderTasks = (category: string | null, date: number | null) => {
     //Check category filter
-    let category_tasks: { name: string; date: string; category: string }[] = [];
+    let category_tasks: {
+      name: string;
+      date: string;
+      category: string;
+      done: boolean;
+    }[] = [];
     if (category) {
       tasks.forEach((task) => {
         if (task.category === category) {
@@ -108,7 +143,12 @@ const CreateTask = () => {
     }
 
     //Check data filter
-    let final_tasks: { name: string; date: string; category: string }[] = [];
+    let final_tasks: {
+      name: string;
+      date: string;
+      category: string;
+      done: boolean;
+    }[] = [];
     const date_now: Date = new Date(Date.now());
     const month = date_now.getMonth();
     const day = date_now.getDay();
@@ -117,9 +157,13 @@ const CreateTask = () => {
       Date.now() + daysUntilSunday * 1000 * 60 * 60 * 24
     );
     nextSunday.setHours(0, 0, 0, 0);
+
     const toNextSunday = new Date(
       nextSunday.getTime() + 7 * 24 * 60 * 60 * 1000
     );
+
+    const previousSunday = new Date(Date.now() - day * 1000 * 60 * 60 * 24);
+    previousSunday.setHours(0, 0, 0, 0);
 
     switch (date) {
       case 0:
@@ -149,7 +193,10 @@ const CreateTask = () => {
         break;
       case 3:
         category_tasks.forEach((task) => {
-          if (new Date(task.date) < nextSunday) {
+          if (
+            new Date(task.date) > previousSunday &&
+            new Date(task.date) < nextSunday
+          ) {
             final_tasks.push(task);
           }
         });
@@ -169,8 +216,32 @@ const CreateTask = () => {
         break;
     }
 
+    //Ocultar concluidas?
+    if (hideDone) {
+      const hide_task: {
+        name: string;
+        date: string;
+        category: string;
+        done: boolean;
+      }[] = [];
+      final_tasks.forEach((task) => {
+        if (task.done) {
+          return;
+        } else {
+          hide_task.push(task);
+          return;
+        }
+      });
+      final_tasks = hide_task;
+    }
+
     //Ordenação
-    let task_order: { name: string; date: string; category: string }[] = [];
+    let task_order: {
+      name: string;
+      date: string;
+      category: string;
+      done: boolean;
+    }[] = [];
     if (final_tasks.length > 1) {
       task_order = final_tasks.sort((a, b) => {
         const dateA = new Date(a.date);
@@ -184,24 +255,39 @@ const CreateTask = () => {
     if (task_order.length != 0) {
       return (
         <>
-          <div className="task">
+          <div className="task_header">
+            <div></div>
             <span>Nome:</span>
             <span>Categoria</span>
             <span>Dia:</span>
-            <span></span>
-            <span></span>
+            <div></div>
+            <div></div>
           </div>
 
           {task_order?.map((task, index) => {
             return (
               <div>
                 <div key={index} className="task">
+                  {task.done ? (
+                    <FaRegSquareCheck
+                      onClick={() => {
+                        toogleDone(index);
+                      }}
+                    />
+                  ) : (
+                    <FaRegSquareFull
+                      onClick={() => {
+                        toogleDone(index);
+                      }}
+                    />
+                  )}
                   <span>{task.name}</span>
-                  <span>{task.category}</span>
-                  <span>Dia: {formatDate(task.date)}</span>
+                  <span className="category">{task.category}</span>
+                  <span>{formatDate(task.date)}</span>
                   <FaPencilAlt
                     onClick={() => {
                       setIndexEdit(index);
+                      setDone(task.done);
                       setEdit(!edit);
                     }}
                   />
@@ -287,11 +373,27 @@ const CreateTask = () => {
   };
 
   const handleDeleteCategory = (index: number) => {
-    setCategories((categories) => {
-      const newCategoryList = [...categories];
-      newCategoryList.splice(index, 1);
-      return newCategoryList;
+    let accept_delete: boolean = true;
+    const category = categories[index];
+    tasks.forEach((task) => {
+      if (task.category == category && !task.done) {
+        accept_delete = false;
+      }
     });
+    if (accept_delete) {
+      setCategories((categories) => {
+        const newCategoryList = [...categories];
+        newCategoryList.splice(index, 1);
+        return newCategoryList;
+      });
+    } else {
+      setSelectedDate(0);
+      setSelectedCategory(category);
+      setHideDone(true);
+      setMessage(
+        "Você não pode deletar uma categoria que tenha tarefas ativas. Elas serão mostradas abaixo."
+      );
+    }
   };
 
   return (
@@ -386,15 +488,21 @@ const CreateTask = () => {
           })}
         </div>
       </div>
+      {message && (
+        <div className="message">
+          <p>{message}</p>
+          <span
+            className="close"
+            onClick={() => {
+              setMessage("");
+            }}
+          >
+            X
+          </span>
+        </div>
+      )}
       <div className="tasks_container">
         <h2>Tarefas</h2>
-        <span className="selected_filter">
-          <ul>
-            Filtros:
-            <li>{selectedCategory}</li>
-            <li>{filterDate}</li>
-          </ul>
-        </span>
         <div className="filters">
           <span
             onClick={() => {
@@ -436,6 +544,8 @@ const CreateTask = () => {
           >
             Todo período
           </span>
+        </div>
+        <div className="second_filters">
           <select
             onChange={(e: ChangeEvent<HTMLSelectElement>) => {
               setSelectedCategory(e.target.value);
@@ -447,7 +557,32 @@ const CreateTask = () => {
                 return <option value={category}>{category}</option>;
               })}
           </select>
-        </div>
+          <span className="filters">
+            {!hideDone ? (
+              <span
+                onClick={() => {
+                  setHideDone(!hideDone);
+                }}
+              >
+                <FaRegSquareFull /> Ocultar concluídas
+              </span>
+            ) : (
+              <span
+                onClick={() => {
+                  setHideDone(!hideDone);
+                }}
+              >
+                <FaRegSquareCheck /> Ocultar Concluídas
+              </span>
+            )}
+          </span>
+        </div>{" "}
+        <span className="selected_filter">
+          Filtros:
+          <span>{selectedCategory}</span>
+          <span>{filterDate}</span>
+          <span>{hideDone && "Ocultar concluídas"}</span>
+        </span>
         {renderTasks(selectedCategory, selectedDate)}
       </div>
     </>
