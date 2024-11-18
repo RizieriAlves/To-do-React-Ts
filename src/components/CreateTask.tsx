@@ -16,7 +16,7 @@ const CreateTask = () => {
   const [newCategory, setNewCategory] = useState<string>("");
   const [categories, setCategories] = useState<string[]>([]);
   const [category, setCategory] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<number | null>(null);
   const [filterDate, setFilterDate] = useState<string | null>("Todo o período");
   const [done, setDone] = useState<boolean>(false);
@@ -51,6 +51,7 @@ const CreateTask = () => {
     setTasks((tasks) => [...tasks, task]);
     setDate("");
     setTaskName("");
+    setCategory("-");
   };
 
   const handleEdit = (index: number) => {
@@ -386,6 +387,7 @@ const CreateTask = () => {
         newCategoryList.splice(index, 1);
         return newCategoryList;
       });
+      setSelectedCategory("");
     } else {
       setSelectedDate(0);
       setSelectedCategory(category);
@@ -434,6 +436,7 @@ const CreateTask = () => {
                 <p>Categoria:</p>
                 <select
                   required
+                  value={category}
                   onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                     setCategory(e.target.value);
                   }}
@@ -492,6 +495,7 @@ const CreateTask = () => {
         <div className="message">
           <p>{message}</p>
           <span
+            style={{ cursor: "pointer" }}
             className="close"
             onClick={() => {
               setMessage("");
@@ -547,6 +551,7 @@ const CreateTask = () => {
         </div>
         <div className="second_filters">
           <select
+            value={selectedCategory}
             onChange={(e: ChangeEvent<HTMLSelectElement>) => {
               setSelectedCategory(e.target.value);
             }}
