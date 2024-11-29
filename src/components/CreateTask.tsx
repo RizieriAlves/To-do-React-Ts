@@ -58,6 +58,8 @@ const CreateTask = () => {
   };
 
   const handleEdit = (index: number) => {
+    setSelectedDate(0);
+    setFilterDate("Todo o Período");
     const new_task: Task = {
       name: taskName,
       date: date,
@@ -288,7 +290,7 @@ const CreateTask = () => {
                     }}
                   />
                 </div>
-                {indexEdit == task.id && (
+                {edit && indexEdit == task.id && (
                   <form
                     onSubmit={() => {
                       handleEdit(task.id);
@@ -338,6 +340,7 @@ const CreateTask = () => {
                     </button>
                     <button
                       onClick={() => {
+                        setEdit(false);
                         handleCancel();
                       }}
                     >
@@ -499,87 +502,91 @@ const CreateTask = () => {
       )}
       <div className="tasks_container">
         <h2>Tarefas</h2>
-        <div className="filters">
-          <span
-            onClick={() => {
-              setSelectedDate(1);
-              setFilterDate("Este mês");
-            }}
-          >
-            Este mês
-          </span>
-          <span
-            onClick={() => {
-              setSelectedDate(2);
-              setFilterDate("Próximo mês");
-            }}
-          >
-            Próximo mês
-          </span>
-          <span
-            onClick={() => {
-              setSelectedDate(3);
-              setFilterDate("Esta semana");
-            }}
-          >
-            Esta semana
-          </span>
-          <span
-            onClick={() => {
-              setSelectedDate(4);
-              setFilterDate("Semana que vem");
-            }}
-          >
-            Semana que vem
-          </span>
-          <span
-            onClick={() => {
-              setSelectedDate(0);
-              setFilterDate("Todo o período");
-            }}
-          >
-            Todo período
-          </span>
-        </div>
-        <div className="second_filters">
-          <select
-            value={selectedCategory}
-            onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-              setSelectedCategory(e.target.value);
-            }}
-          >
-            <option value="">Todas as categorias</option>
-            {categories &&
-              categories.map((category) => {
-                return <option value={category}>{category}</option>;
-              })}
-          </select>
-          <span className="filters">
-            {!hideDone ? (
+        {!edit && (
+          <>
+            <div className="filters">
               <span
                 onClick={() => {
-                  setHideDone(!hideDone);
+                  setSelectedDate(1);
+                  setFilterDate("Este mês");
                 }}
               >
-                <FaRegSquareFull /> Ocultar concluídas
+                Este mês
               </span>
-            ) : (
               <span
                 onClick={() => {
-                  setHideDone(!hideDone);
+                  setSelectedDate(2);
+                  setFilterDate("Próximo mês");
                 }}
               >
-                <FaRegSquareCheck /> Ocultar Concluídas
+                Próximo mês
               </span>
-            )}
-          </span>
-        </div>{" "}
-        <span className="selected_filter">
-          Filtros:
-          <span>{selectedCategory}</span>
-          <span>{filterDate}</span>
-          <span>{hideDone && "Ocultar concluídas"}</span>
-        </span>
+              <span
+                onClick={() => {
+                  setSelectedDate(3);
+                  setFilterDate("Esta semana");
+                }}
+              >
+                Esta semana
+              </span>
+              <span
+                onClick={() => {
+                  setSelectedDate(4);
+                  setFilterDate("Semana que vem");
+                }}
+              >
+                Semana que vem
+              </span>
+              <span
+                onClick={() => {
+                  setSelectedDate(0);
+                  setFilterDate("Todo o período");
+                }}
+              >
+                Todo período
+              </span>
+            </div>
+            <div className="second_filters">
+              <select
+                value={selectedCategory}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                  setSelectedCategory(e.target.value);
+                }}
+              >
+                <option value="">Todas as categorias</option>
+                {categories &&
+                  categories.map((category) => {
+                    return <option value={category}>{category}</option>;
+                  })}
+              </select>
+              <span className="filters">
+                {hideDone ? (
+                  <span
+                    onClick={() => {
+                      setHideDone(!hideDone);
+                    }}
+                  >
+                    <FaRegSquareCheck /> Ocultar concluídas
+                  </span>
+                ) : (
+                  <span
+                    onClick={() => {
+                      setHideDone(!hideDone);
+                    }}
+                  >
+                    <FaRegSquareFull /> Ocultar concluídas
+                  </span>
+                )}
+              </span>
+            </div>
+            <span className="selected_filter">
+              Filtros:
+              <span>{selectedCategory}</span>
+              <span>{filterDate}</span>
+              <span>{hideDone && "Ocultar concluídas"}</span>
+            </span>
+          </>
+        )}
         {renderTasks(selectedCategory, selectedDate)}
       </div>
     </>
