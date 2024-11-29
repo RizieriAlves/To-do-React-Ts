@@ -8,9 +8,7 @@ import { FaRegSquareFull } from "react-icons/fa6";
 const CreateTask = () => {
   const [taskName, setTaskName] = useState<string>("");
   const [date, setDate] = useState<string>("");
-  const [tasks, setTasks] = useState<
-    { name: string; date: string; category: string; done: boolean }[]
-  >([]);
+  const [tasks, setTasks] = useState<Tasks>([]);
   const [indexEdit, setIndexEdit] = useState<number | null>(null);
   const [edit, setEdit] = useState<boolean>(false);
   const [newCategory, setNewCategory] = useState<string>("");
@@ -22,6 +20,15 @@ const CreateTask = () => {
   const [done, setDone] = useState<boolean>(false);
   const [hideDone, setHideDone] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
+
+  type Tasks = Task[];
+  type Task = {
+    name: string;
+    date: string;
+    category: string;
+    done: boolean;
+    id: number;
+  };
 
   //Feito desta forma pois devido ao fuso, era reduzido um dia no transformação com toLocaleDateString()
   const formatDate = (date: string) => {
@@ -36,16 +43,12 @@ const CreateTask = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const task: {
-      name: string;
-      date: string;
-      category: string;
-      done: boolean;
-    } = {
+    const task: Task = {
       name: taskName,
       date: date,
       category: category,
       done: false,
+      id: Date.now(),
     };
 
     setTasks((tasks) => [...tasks, task]);
@@ -55,28 +58,28 @@ const CreateTask = () => {
   };
 
   const handleEdit = (index: number) => {
-    const task: {
-      name: string;
-      date: string;
-      category: string;
-      done: boolean;
-    } = {
+    const new_task: Task = {
       name: taskName,
       date: date,
       category: category,
       done: done,
+      id: Date.now(),
     };
-    const newTaskList: {
-      name: string;
-      date: string;
-      category: string;
-      done: boolean;
-    }[] = [...tasks];
-    newTaskList[index] = task;
-    setDate("");
-    setTaskName("");
+    let newTaskList: Tasks = [...tasks];
+    newTaskList = newTaskList.map((task) => {
+      if (task.id == index) {
+        task = new_task;
+        return task;
+      } else {
+        return task;
+      }
+    });
     setIndexEdit(null);
     setDone(false);
+    setEdit(false);
+    setTaskName("");
+    setDate("");
+    setCategory("-");
     return setTasks(newTaskList);
   };
 
@@ -87,10 +90,12 @@ const CreateTask = () => {
   };
 
   const handleDelete = (index: number) => {
-    setTasks((tasks) => {
-      const newTaskList = [...tasks];
-      newTaskList.splice(index, 1);
-      return newTaskList;
+    const newTaskList: Tasks = [];
+    tasks.forEach((task) => {
+      if (task.id != index) {
+        newTaskList.push(task);
+      }
+      setTasks(newTaskList);
     });
   };
 
@@ -107,6 +112,7 @@ const CreateTask = () => {
 
   useEffect(() => {
     saveLS();
+    console.log(tasks);
   }, [tasks, categories]);
 
   const saveLS = () => {
@@ -115,8 +121,8 @@ const CreateTask = () => {
   };
 
   const toogleDone = (index: number) => {
-    const newtasks = tasks.map((task, i) => {
-      if (i == index) {
+    const newtasks = tasks.map((task) => {
+      if (task.id == index) {
         task.done = !task.done;
         return task;
       }
@@ -124,15 +130,11 @@ const CreateTask = () => {
     });
     setTasks(newtasks);
   };
+
   //Check filters, set tasks order, render tasks
-  const renderTasks = (category: string | null, date: number | null) => {
+  const renderTasks = (category: string | null, date_filter: number | null) => {
     //Check category filter
-    let category_tasks: {
-      name: string;
-      date: string;
-      category: string;
-      done: boolean;
-    }[] = [];
+    let category_tasks: Tasks = [];
     if (category) {
       tasks.forEach((task) => {
         if (task.category === category) {
@@ -144,12 +146,7 @@ const CreateTask = () => {
     }
 
     //Check data filter
-    let final_tasks: {
-      name: string;
-      date: string;
-      category: string;
-      done: boolean;
-    }[] = [];
+    let final_tasks: Tasks = [];
     const date_now: Date = new Date(Date.now());
     const month = date_now.getMonth();
     const day = date_now.getDay();
@@ -166,7 +163,7 @@ const CreateTask = () => {
     const previousSunday = new Date(Date.now() - day * 1000 * 60 * 60 * 24);
     previousSunday.setHours(0, 0, 0, 0);
 
-    switch (date) {
+    switch (date_filter) {
       case 0:
         final_tasks = category_tasks;
         break;
@@ -219,12 +216,7 @@ const CreateTask = () => {
 
     //Ocultar concluidas?
     if (hideDone) {
-      const hide_task: {
-        name: string;
-        date: string;
-        category: string;
-        done: boolean;
-      }[] = [];
+      const hide_task: Tasks = [];
       final_tasks.forEach((task) => {
         if (task.done) {
           return;
@@ -237,12 +229,7 @@ const CreateTask = () => {
     }
 
     //Ordenação
-    let task_order: {
-      name: string;
-      date: string;
-      category: string;
-      done: boolean;
-    }[] = [];
+    let task_order: Tasks = [];
     if (final_tasks.length > 1) {
       task_order = final_tasks.sort((a, b) => {
         const dateA = new Date(a.date);
@@ -265,20 +252,20 @@ const CreateTask = () => {
             <div></div>
           </div>
 
-          {task_order?.map((task, index) => {
+          {task_order?.map((task) => {
             return (
               <div>
-                <div key={index} className="task">
+                <div key={task.id} className="task">
                   {task.done ? (
                     <FaRegSquareCheck
                       onClick={() => {
-                        toogleDone(index);
+                        toogleDone(task.id);
                       }}
                     />
                   ) : (
                     <FaRegSquareFull
                       onClick={() => {
-                        toogleDone(index);
+                        toogleDone(task.id);
                       }}
                     />
                   )}
@@ -287,21 +274,24 @@ const CreateTask = () => {
                   <span>{formatDate(task.date)}</span>
                   <FaPencilAlt
                     onClick={() => {
-                      setIndexEdit(index);
+                      setIndexEdit(task.id);
                       setDone(task.done);
                       setEdit(!edit);
+                      setTaskName(task.name);
+                      setDate(task.date);
+                      setCategory(task.category);
                     }}
                   />
                   <FaTrash
                     onClick={() => {
-                      handleDelete(index);
+                      handleDelete(task.id);
                     }}
                   />
                 </div>
-                {indexEdit == index && (
+                {indexEdit == task.id && (
                   <form
                     onSubmit={() => {
-                      handleEdit(index);
+                      handleEdit(task.id);
                     }}
                     className="editForm"
                   >
@@ -309,6 +299,7 @@ const CreateTask = () => {
                       <h4>Titulo:</h4>
                       <input
                         type="text"
+                        value={taskName}
                         placeholder="Digite o novo nome da tarefa"
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                           setTaskName(e.target.value);
@@ -320,6 +311,7 @@ const CreateTask = () => {
                       <h4>Prazo/Dia:</h4>
                       <input
                         type="date"
+                        value={date}
                         required
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                           setDate(e.target.value);
