@@ -278,10 +278,10 @@ const CreateTask = () => {
                     onClick={() => {
                       setIndexEdit(task.id);
                       setDone(task.done);
-                      setEdit(!edit);
                       setTaskName(task.name);
                       setDate(task.date);
                       setCategory(task.category);
+                      setEdit(!edit);
                     }}
                   />
                   <FaTrash
