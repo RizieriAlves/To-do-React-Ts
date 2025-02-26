@@ -114,7 +114,6 @@ const CreateTask = () => {
 
   useEffect(() => {
     saveLS();
-    console.log(tasks);
   }, [tasks, categories]);
 
   const saveLS = () => {
