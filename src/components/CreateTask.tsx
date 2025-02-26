@@ -97,8 +97,8 @@ const CreateTask = () => {
       if (task.id != index) {
         newTaskList.push(task);
       }
-      setTasks(newTaskList);
     });
+    setTasks(newTaskList);
   };
 
   useEffect(() => {
