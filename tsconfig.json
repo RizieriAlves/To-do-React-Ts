@@ -1,12 +1,4 @@
 {
-  "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "outDir": "dist",
-    "moduleResolution": "node",
-    "allowJs": true
-  },
-
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
