@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://rizierialves.github.io/To-do-ReactJs-TS",
+  "homepage": "https://rizierialves.github.io/To-do-React-Ts",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
